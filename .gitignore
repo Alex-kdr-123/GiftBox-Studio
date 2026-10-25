@@ -1,0 +1,39 @@
+# ОС и редакторы
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+
+# Логи и временные файлы
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Переменные окружения и секреты
+.env
+.env.local
+.env.*.local
+
+# Зависимости (на случай, если потом добавишь npm)
+node_modules/
+package-lock.json
+yarn.lock
+
+# Сборка и дистрибутивы
+dist/
+build/
+*.zip
+
+# Временные файлы и черновики
+*.tmp
+*.bak
+*~
+
+# Черновики и документация (не коммитить)
+*_TZ.md
+*_Schema.md
+*_Layout_Full.md
+*_Code_v1.md
+GiftBox_Full_Code.md

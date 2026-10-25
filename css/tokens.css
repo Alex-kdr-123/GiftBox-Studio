@@ -1,0 +1,96 @@
+/* =========================================================
+   tokens.css — дизайн-токены (CSS custom properties)
+   Тёмная тема. База: #121212, акцент: #ff7a45.
+   ========================================================= */
+
+:root {
+  /* ── Цвета: фон и поверхности ── */
+  --bg:                 #121212;
+  --bg-elevated:        #1a1a1a;
+  --bg-surface:         #1e1e1e;
+  --bg-surface-hover:   #262626;
+  --bg-input:           #1a1a1a;
+  --bg-overlay:         rgba(0, 0, 0, 0.65);
+
+  /* ── Цвета: текст ── */
+  --text:               #f2f2f2;
+  --text-muted:         #a3a3a3;
+  --text-subtle:        #737373;
+  --text-on-accent:     #121212;
+
+  /* ── Цвета: акцент ── */
+  --accent:             #ff7a45;
+  --accent-hover:       #ff8f62;
+  --accent-active:      #e8662f;
+  --accent-soft:        rgba(255, 122, 69, 0.14);
+  --accent-border:      rgba(255, 122, 69, 0.45);
+
+  /* ── Цвета: статусы ── */
+  --danger:             #ef4444;
+  --danger-hover:       #f87171;
+  --danger-soft:        rgba(239, 68, 68, 0.14);
+  --success:            #22c55e;
+  --success-soft:       rgba(34, 197, 94, 0.14);
+  --warning:            #eab308;
+  --warning-soft:       rgba(234, 179, 8, 0.14);
+
+  /* ── Границы ── */
+  --border:             #2e2e2e;
+  --border-hover:       #3f3f3f;
+  --border-focus:       var(--accent);
+
+  /* ── Тени ── */
+  --shadow-sm:          0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md:          0 4px 16px rgba(0, 0, 0, 0.5);
+  --shadow-lg:          0 12px 40px rgba(0, 0, 0, 0.6);
+
+  /* ── Радиусы ── */
+  --radius-sm:          6px;
+  --radius-md:          10px;
+  --radius-lg:          16px;
+  --radius-full:        999px;
+
+  /* ── Отступы (шкала 4px) ── */
+  --space-1:            4px;
+  --space-2:            8px;
+  --space-3:            12px;
+  --space-4:            16px;
+  --space-5:            20px;
+  --space-6:            24px;
+  --space-8:            32px;
+  --space-10:           40px;
+  --space-12:           48px;
+  --space-16:           64px;
+
+  /* ── Типографика ── */
+  --font-sans:          system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono:          ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  --fs-xs:              12px;
+  --fs-sm:              14px;
+  --fs-base:            16px;
+  --fs-lg:              18px;
+  --fs-xl:              22px;
+  --fs-2xl:             28px;
+  --fs-3xl:             36px;
+
+  --lh-tight:           1.2;
+  --lh-base:            1.5;
+  --lh-relaxed:         1.65;
+
+  --fw-regular:         400;
+  --fw-medium:          500;
+  --fw-semibold:        600;
+  --fw-bold:            700;
+
+  /* ── Прочее ── */
+  --container-max:      1120px;
+  --container-narrow:   760px;
+  --header-h:           60px;
+  --focus-ring:         0 0 0 2px var(--bg), 0 0 0 4px var(--accent);
+  --transition:         150ms ease;
+  --transition-slow:    250ms ease;
+  --z-header:           100;
+  --z-toast:            200;
+  --z-modal:            300;
+}

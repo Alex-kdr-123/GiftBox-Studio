@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark">
+  <meta name="description" content="GiftBox Studio — собирайте подборки подарков за минуты и делитесь ссылкой">
+  <title>GiftBox Studio</title>
+
+  <!-- CSS: порядок важен (tokens → base → components → screens → utilities) -->
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/screens.css">
+  <link rel="stylesheet" href="css/utilities.css">
+</head>
+<body>
+
+  <!-- ═══════════════ SKIP LINK (a11y) ═══════════════ -->
+  <a href="#main-content" class="skip-link">Перейти к содержимому</a>
+
+  <!-- ═══════════════ TOAST CONTAINER (aria-live) ═══════════════ -->
+  <!-- JS будет рендерить тосты сюда. role=status + aria-live=polite. -->
+  <div id="toast-container" class="toast-container" role="status" aria-live="polite" aria-atomic="false"></div>
+
+  <!-- ═══════════════ APP HEADER ═══════════════ -->
+  <header class="app-header" role="banner">
+    <div class="app-header__inner">
+      <a href="#/dashboard" class="app-header__logo" aria-label="GiftBox Studio — на главную">
+        <span class="app-header__logo-mark" aria-hidden="true">🎁</span>
+        <span class="app-header__logo-text">GiftBox Studio</span>
+      </a>
+
+      <nav class="app-nav" aria-label="Основная навигация">
+        <ul class="app-nav__list">
+          <li class="app-nav__item">
+            <a href="#/dashboard" class="app-nav__link" data-nav="dashboard">Дашборд</a>
+          </li>
+          <li class="app-nav__item">
+            <a href="#/catalog" class="app-nav__link" data-nav="catalog">Каталог</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ═══════════════ MAIN (SPA-контейнер) ═══════════════ -->
+  <main id="main-content" class="app-main">
+
+    <!-- ═─────────────────────────────────────────────── -->
+    <!-- ЭКРАН 1: DASHBOARD  (#/dashboard)               -->
+    <!-- ═─────────────────────────────────────────────── -->
+    <section id="screen-dashboard" class="screen screen--dashboard" aria-labelledby="dashboard-title" hidden>
+      <div class="screen__inner">
+
+        <header class="page-header">
+          <div class="page-header__text">
+            <h1 id="dashboard-title" class="page-header__title">Дашборд</h1>
+            <p class="page-header__subtitle">Ваши подборки подарков — собирайте, публикуйте, делитесь</p>
+          </div>
+          <div class="page-header__actions">
+            <!-- JS: кнопка create collection -->
+            <button id="btn-create-collection" type="button" class="btn btn--primary">
+              <span class="btn__icon" aria-hidden="true">＋</span>
+              <span class="btn__label">Создать подборку</span>
+            </button>
+          </div>
+        </header>
+
+        <!-- Сводка (getStats) -->
+        <section class="stats" aria-label="Сводка">
+          <div class="stats__item">
+            <span class="stats__value" id="stat-products">0</span>
+            <span class="stats__label">Товаров</span>
+          </div>
+          <div class="stats__item">
+            <span class="stats__value" id="stat-collections">0</span>
+            <span class="stats__label">Подборок</span>
+          </div>
+          <div class="stats__item">
+            <span class="stats__value" id="stat-views">0</span>
+            <span class="stats__label">Просмотров</span>
+          </div>
+        </section>
+
+        <!-- Тулбар: сортировка + фильтр по теме -->
+        <div class="toolbar" role="group" aria-label="Сортировка и фильтрация подборок">
+          <div class="toolbar__group">
+            <label for="dashboard-sort" class="toolbar__label">Сортировка</label>
+            <select id="dashboard-sort" class="select">
+              <option value="date">По дате</option>
+              <option value="views">По просмотрам</option>
+            </select>
+          </div>
+
+          <div class="toolbar__group">
+            <label for="dashboard-theme" class="toolbar__label">Тема</label>
+            <!-- JS заполнит опции тем из коллекций -->
+            <select id="dashboard-theme" class="select">
+              <option value="">Все темы</option>
+              <!-- JS будет рендерить сюда -->
+            </select>
+          </div>
+        </div>
+
+        <!-- Пустое состояние дашборда (onboarding) -->
+        <div id="dashboard-empty" class="empty-state" hidden>
+          <div class="empty-state__icon" aria-hidden="true">🎁</div>
+          <h2 class="empty-state__title">Создайте первую подборку</h2>
+          <p class="empty-state__text">
+            Начните с добавления товаров в каталог, затем соберите из них подборку и поделитесь ссылкой.
+          </p>
+          <div class="empty-state__actions">
+            <a href="#/catalog" class="btn btn--secondary">Перейти в каталог</a>
+            <button type="button" class="btn btn--primary" data-action="create-collection-from-empty">
+              Создать подборку
+            </button>
+          </div>
+        </div>
+
+        <!-- Список коллекций (карточки) -->
+        <!-- JS будет рендерить сюда -->
+        <ul id="dashboard-list" class="collection-grid" aria-label="Список подборок"></ul>
+
+      </div>
+    </section>
+
+    <!-- ═─────────────────────────────────────────────── -->
+    <!-- ЭКРАН 2: CATALOG  (#/catalog)                   -->
+    <!-- ═─────────────────────────────────────────────── -->
+    <section id="screen-catalog" class="screen screen--catalog" aria-labelledby="catalog-title" hidden>
+      <div class="screen__inner">
+
+        <header class="page-header">
+          <div class="page-header__text">
+            <h1 id="catalog-title" class="page-header__title">Каталог товаров</h1>
+            <p class="page-header__subtitle">Добавляйте товары, чтобы использовать их в подборках</p>
+          </div>
+          <div class="page-header__actions">
+            <!-- JS: открывает модалку создания Product -->
+            <button id="btn-create-product" type="button" class="btn btn--primary">
+              <span class="btn__icon" aria-hidden="true">＋</span>
+              <span class="btn__label">Добавить товар</span>
+            </button>
+          </div>
+        </header>
+
+        <!-- Панель поиска и фильтров -->
+        <div class="catalog-filters" role="search">
+          <div class="catalog-filters__row">
+            <div class="field field--search">
+              <label for="catalog-search" class="field__label visually-hidden">Поиск по товарам</label>
+              <input type="search" id="catalog-search" class="input input--search"
+                     placeholder="Поиск по названию или тегу…" autocomplete="off">
+            </div>
+          </div>
+
+          <!-- Чипы категорий (фиксированные 5) -->
+          <div class="chips" role="group" aria-label="Фильтр по категории">
+            <button type="button" class="chip chip--active" data-category="" aria-pressed="true">Все</button>
+            <button type="button" class="chip" data-category="Сувениры" aria-pressed="false">Сувениры</button>
+            <button type="button" class="chip" data-category="Цветы" aria-pressed="false">Цветы</button>
+            <button type="button" class="chip" data-category="Гаджеты" aria-pressed="false">Гаджеты</button>
+            <button type="button" class="chip" data-category="Сладости" aria-pressed="false">Сладости</button>
+            <button type="button" class="chip" data-category="Открытки" aria-pressed="false">Открытки</button>
+          </div>
+        </div>
+
+        <!-- Пустое состояние каталога -->
+        <div id="catalog-empty" class="empty-state" hidden>
+          <div class="empty-state__icon" aria-hidden="true">📦</div>
+          <h2 class="empty-state__title">Пока нет товаров</h2>
+          <p class="empty-state__text">Добавьте первый — это займёт 30 секунд.</p>
+          <div class="empty-state__actions">
+            <button type="button" class="btn btn--primary" data-action="create-product-from-empty">
+              Добавить товар
+            </button>
+          </div>
+        </div>
+
+        <!-- Список товаров (карточки) -->
+        <!-- JS будет рендерить сюда -->
+        <ul id="catalog-list" class="product-grid" aria-label="Список товаров"></ul>
+
+      </div>
+    </section>
+
+    <!-- ═─────────────────────────────────────────────── -->
+    <!-- ЭКРАН 3: COLLECTION EDITOR  (#/collections/:id) -->
+    <!-- ═─────────────────────────────────────────────── -->
+    <section id="screen-editor" class="screen screen--editor" aria-labelledby="editor-title" hidden>
+      <div class="screen__inner">
+
+        <header class="page-header page-header--editor">
+          <div class="page-header__text">
+            <nav class="breadcrumb" aria-label="Хлебные крошки">
+              <a href="#/dashboard" class="breadcrumb__link">Дашборд</a>
+              <span class="breadcrumb__sep" aria-hidden="true">/</span>
+              <span class="breadcrumb__current" aria-current="page">Редактор подборки</span>
+            </nav>
+            <!-- JS подставит title в этот h1 -->
+            <h1 id="editor-title" class="page-header__title">Редактор подборки</h1>
+          </div>
+          <div class="page-header__actions">
+            <!-- Кнопки publish / unpublish (видимость управляет JS) -->
+            <button id="btn-publish-collection" type="button" class="btn btn--primary" hidden>
+              Опубликовать
+            </button>
+            <button id="btn-unpublish-collection" type="button" class="btn btn--ghost" hidden>
+              Снять с публикации
+            </button>
+          </div>
+        </header>
+
+        <div class="editor-layout">
+
+          <!-- Левая колонка: форма настроек подборки -->
+          <form id="form-collection" class="editor-form" novalidate>
+            <h2 class="editor-form__heading">Настройки подборки</h2>
+
+            <div class="field">
+              <label for="collection-title" class="field__label">Название <span class="field__required" aria-hidden="true">*</span></label>
+              <input type="text" id="collection-title" name="title" class="input"
+                     maxlength="100" required aria-required="true" autocomplete="off">
+              <p class="field__hint">2–100 символов</p>
+              <p class="field__error" id="collection-title-error" role="alert" hidden></p>
+            </div>
+
+            <div class="field">
+              <label for="collection-theme" class="field__label">Тема</label>
+              <input type="text" id="collection-theme" name="theme" class="input"
+                     maxlength="50" autocomplete="off">
+              <p class="field__hint">0–50 символов. Например: «Новый год», «8 марта»</p>
+            </div>
+
+            <div class="field">
+              <label for="collection-description" class="field__label">Описание</label>
+              <textarea id="collection-description" name="description" class="textarea"
+                        maxlength="500" rows="3"></textarea>
+              <p class="field__hint">До 500 символов</p>
+            </div>
+
+            <div class="field">
+              <label for="collection-cover-url" class="field__label">Обложка (URL)</label>
+              <input type="url" id="collection-cover-url" name="coverUrl" class="input"
+                     placeholder="https://…" autocomplete="off">
+              <p class="field__hint">Если не задана — покажем обложку первого товара</p>
+            </div>
+
+            <div class="field">
+              <label for="collection-slug" class="field__label">Slug (генерируется при публикации)</label>
+              <input type="text" id="collection-slug" name="slug" class="input" readonly
+                     aria-readonly="true" placeholder="—">
+              <p class="field__hint">Заполняется автоматически при публикации, изменить нельзя</p>
+            </div>
+
+            <!-- Статус публикации (readonly-индикатор) -->
+            <div class="field">
+              <span class="field__label">Статус</span>
+              <p class="badge badge--draft" id="collection-status">Черновик</p>
+            </div>
+
+            <div class="editor-form__actions">
+              <button type="submit" id="btn-save-collection" class="btn btn--primary">Сохранить</button>
+              <button type="button" id="btn-duplicate-collection" class="btn btn--secondary">Дублировать</button>
+              <button type="button" id="btn-delete-collection" class="btn btn--danger">Удалить</button>
+            </div>
+          </form>
+
+          <!-- Правая колонка: список товаров подборки + добавление -->
+          <section class="editor-products" aria-labelledby="editor-products-title">
+            <div class="editor-products__header">
+              <h2 id="editor-products-title" class="editor-form__heading">Товары в подборке</h2>
+              <!-- JS: открывает каталог/модалку выбора товаров -->
+              <button type="button" id="btn-add-products" class="btn btn--secondary btn--sm">
+                ＋ Добавить товары
+              </button>
+            </div>
+
+            <!-- Пустое состояние подборки -->
+            <div id="editor-products-empty" class="empty-state empty-state--compact" hidden>
+              <div class="empty-state__icon" aria-hidden="true">🛒</div>
+              <h3 class="empty-state__title">Подборка пуста</h3>
+              <p class="empty-state__text">Добавьте товары из каталога.</p>
+            </div>
+
+            <!-- Список товаров с кнопками ↑/↓ -->
+            <!-- JS будет рендерить сюда -->
+            <ul id="editor-products-list" class="sortable-list" aria-label="Товары в подборке"></ul>
+
+            <!-- Подсказка о валидации публикации -->
+            <p id="editor-publish-hint" class="editor-products__hint" role="note">
+              Чтобы опубликовать подборку, добавьте минимум один товар.
+            </p>
+          </section>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ═─────────────────────────────────────────────── -->
+    <!-- ЭКРАН 4: SHARE  (#/share/:slug)                 -->
+    <!-- ═─────────────────────────────────────────────── -->
+    <section id="screen-share" class="screen screen--share" aria-labelledby="share-title" hidden>
+      <div class="screen__inner screen__inner--narrow">
+
+        <!-- Контент подборки -->
+        <article id="share-content" class="share" hidden>
+          <div class="share__cover">
+            <!-- JS подставит img или плейсхолдер -->
+            <img id="share-cover-img" class="share__cover-img" src="" alt="" hidden>
+            <div id="share-cover-placeholder" class="share__cover-placeholder" aria-hidden="true">🎁</div>
+          </div>
+
+          <header class="share__header">
+            <h1 id="share-title" class="share__title">Название подборки</h1>
+            <p id="share-theme" class="share__theme" hidden></p>
+            <p id="share-description" class="share__description" hidden></p>
+            <p class="share__meta">
+              <span class="share__views">
+                <span class="share__views-icon" aria-hidden="true">👁</span>
+                <span id="share-views-count">0</span> просмотров
+              </span>
+            </p>
+          </header>
+
+          <!-- Список товаров в сохранённом порядке -->
+          <!-- JS будет рендерить сюда -->
+          <ul id="share-products-list" class="share__products" aria-label="Товары в подборке"></ul>
+
+          <!-- Пустое состояние подборки (для черновика, если всё же открыли) -->
+          <div id="share-products-empty" class="empty-state empty-state--compact" hidden>
+            <div class="empty-state__icon" aria-hidden="true">🛒</div>
+            <h3 class="empty-state__title">В подборке пока нет товаров</h3>
+          </div>
+
+          <div class="share__actions">
+            <!-- JS: Web Share API → fallback «Скопировать ссылку» → fallback модалка -->
+            <button type="button" id="btn-share" class="btn btn--primary">
+              <span class="btn__icon" aria-hidden="true">🔗</span>
+              <span class="btn__label">Поделиться</span>
+            </button>
+          </div>
+        </article>
+
+        <!-- Not Found (невалидный slug) -->
+        <div id="share-not-found" class="empty-state empty-state--page" hidden>
+          <div class="empty-state__icon" aria-hidden="true">🔍</div>
+          <h1 class="empty-state__title">Подборка не найдена</h1>
+          <p class="empty-state__text">Возможно, ссылка устарела или подборка была удалена.</p>
+          <div class="empty-state__actions">
+            <a href="#/dashboard" class="btn btn--primary">На главную</a>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ═══════════════ FOOTER ═══════════════ -->
+  <footer class="app-footer" role="contentinfo">
+    <p class="app-footer__text">GiftBox Studio — данные хранятся локально в вашем браузере</p>
+  </footer>
+
+  <!-- ═══════════════ МОДАЛКИ ═══════════════ -->
+
+  <!-- Модалка Product (create / edit) -->
+  <div id="modal-product" class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-product-title" hidden>
+    <div class="modal__backdrop" data-close-modal="product"></div>
+    <div class="modal__content">
+      <header class="modal__header">
+        <h2 id="modal-product-title" class="modal__title">Добавить товар</h2>
+        <button type="button" class="modal__close" data-close-modal="product" aria-label="Закрыть">✕</button>
+      </header>
+
+      <form id="form-product" class="modal__body" novalidate>
+        <div class="field">
+          <label for="product-title" class="field__label">Название <span class="field__required" aria-hidden="true">*</span></label>
+          <input type="text" id="product-title" name="title" class="input" maxlength="80" required aria-required="true" autocomplete="off">
+          <p class="field__hint">2–80 символов</p>
+          <p class="field__error" id="product-title-error" role="alert" hidden></p>
+        </div>
+
+        <div class="field">
+          <label for="product-price" class="field__label">Цена, ₽ <span class="field__required" aria-hidden="true">*</span></label>
+          <input type="number" id="product-price" name="price" class="input" min="0" step="1" required aria-required="true">
+          <p class="field__error" id="product-price-error" role="alert" hidden></p>
+        </div>
+
+        <div class="field">
+          <label for="product-category" class="field__label">Категория <span class="field__required" aria-hidden="true">*</span></label>
+          <select id="product-category" name="category" class="select" required aria-required="true">
+            <option value="">Выберите категорию</option>
+            <option value="Сувениры">Сувениры</option>
+            <option value="Цветы">Цветы</option>
+            <option value="Гаджеты">Гаджеты</option>
+            <option value="Сладости">Сладости</option>
+            <option value="Открытки">Открытки</option>
+          </select>
+          <p class="field__error" id="product-category-error" role="alert" hidden></p>
+        </div>
+
+        <div class="field">
+          <label for="product-image-url" class="field__label">Изображение (URL)</label>
+          <input type="url" id="product-image-url" name="imageUrl" class="input" placeholder="https://…" autocomplete="off">
+          <p class="field__hint">Только ссылка. Base64 и загрузка файлов запрещены.</p>
+          <p class="field__error" id="product-image-url-error" role="alert" hidden></p>
+        </div>
+
+        <div class="field">
+          <label for="product-description" class="field__label">Описание</label>
+          <textarea id="product-description" name="description" class="textarea" maxlength="300" rows="3"></textarea>
+          <p class="field__hint">До 300 символов</p>
+        </div>
+
+        <div class="field">
+          <label for="product-tags" class="field__label">Ключевые слова для поиска</label>
+          <input type="text" id="product-tags" name="tags" class="input" placeholder="через запятую" autocomplete="off">
+          <p class="field__hint">Например: для дома, кухня, подарок маме. Через запятую</p>
+          <p class="field__error" id="product-tags-error" role="alert" hidden></p>
+        </div>
+      </form>
+
+      <footer class="modal__footer">
+        <button type="button" class="btn btn--ghost" data-close-modal="product">Отмена</button>
+        <!-- form="form-product" связывает кнопку с формой -->
+        <button type="submit" form="form-product" id="btn-save-product" class="btn btn--primary">Сохранить</button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Модалка выбора товаров для подборки -->
+  <div id="modal-product-picker" class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-picker-title" hidden>
+    <div class="modal__backdrop" data-close-modal="product-picker"></div>
+    <div class="modal__content modal__content--wide">
+      <header class="modal__header">
+        <h2 id="modal-picker-title" class="modal__title">Выберите товары</h2>
+        <button type="button" class="modal__close" data-close-modal="product-picker" aria-label="Закрыть">✕</button>
+      </header>
+
+      <div class="modal__body">
+        <div class="field field--search">
+          <label for="picker-search" class="field__label visually-hidden">Поиск товаров</label>
+          <input type="search" id="picker-search" class="input input--search" placeholder="Поиск по названию или тегу…" autocomplete="off">
+        </div>
+
+        <!-- Список товаров для выбора -->
+        <!-- JS будет рендерить сюда -->
+        <ul id="picker-list" class="picker-list" aria-label="Товары для добавления"></ul>
+
+        <!-- Пустое состояние (если каталог пуст) -->
+        <div id="picker-empty" class="empty-state empty-state--compact" hidden>
+          <div class="empty-state__icon" aria-hidden="true">📦</div>
+          <h3 class="empty-state__title">В каталоге нет товаров</h3>
+          <p class="empty-state__text">Сначала добавьте товары в каталог.</p>
+          <a href="#/catalog" class="btn btn--secondary" data-close-modal="product-picker">Перейти в каталог</a>
+        </div>
+      </div>
+
+      <footer class="modal__footer">
+        <button type="button" class="btn btn--ghost" data-close-modal="product-picker">Отмена</button>
+        <button type="button" id="btn-picker-confirm" class="btn btn--primary">Добавить выбранные</button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Модалка подтверждения (удаление / сброс БД / лимит) -->
+  <div id="modal-confirm" class="modal" role="alertdialog" aria-modal="true" aria-labelledby="modal-confirm-title" aria-describedby="modal-confirm-text" hidden>
+    <div class="modal__backdrop" data-close-modal="confirm"></div>
+    <div class="modal__content modal__content--sm">
+      <header class="modal__header">
+        <h2 id="modal-confirm-title" class="modal__title">Подтвердите действие</h2>
+        <button type="button" class="modal__close" data-close-modal="confirm" aria-label="Закрыть">✕</button>
+      </header>
+      <div class="modal__body">
+        <p id="modal-confirm-text" class="modal__text">Вы уверены?</p>
+      </div>
+      <footer class="modal__footer">
+        <button type="button" class="btn btn--ghost" data-close-modal="confirm">Отмена</button>
+        <button type="button" id="btn-confirm-ok" class="btn btn--danger">Подтвердить</button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Модалка fallback для шаринга (когда нет Web Share и clipboard) -->
+  <div id="modal-share-fallback" class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-share-title" hidden>
+    <div class="modal__backdrop" data-close-modal="share-fallback"></div>
+    <div class="modal__content modal__content--sm">
+      <header class="modal__header">
+        <h2 id="modal-share-title" class="modal__title">Ссылка на подборку</h2>
+        <button type="button" class="modal__close" data-close-modal="share-fallback" aria-label="Закрыть">✕</button>
+      </header>
+      <div class="modal__body">
+        <div class="field">
+          <label for="share-url" class="field__label visually-hidden">Ссылка</label>
+          <input type="text" id="share-url" class="input" readonly aria-readonly="true">
+        </div>
+        <p class="modal__text">Скопируйте ссылку вручную (Ctrl+C / ⌘+C).</p>
+      </div>
+      <footer class="modal__footer">
+        <button type="button" class="btn btn--primary" data-close-modal="share-fallback">Готово</button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Модалка сброса БД при STORAGE_CORRUPTED -->
+  <div id="modal-storage-reset" class="modal" role="alertdialog" aria-modal="true" aria-labelledby="modal-storage-title" aria-describedby="modal-storage-text" hidden>
+    <div class="modal__backdrop"></div>
+    <div class="modal__content modal__content--sm">
+      <header class="modal__header">
+        <h2 id="modal-storage-title" class="modal__title">Данные повреждены</h2>
+      </header>
+      <div class="modal__body">
+        <p id="modal-storage-text" class="modal__text">
+          Локальное хранилище содержит некорректные данные. Чтобы продолжить, нужно сбросить его.
+          Это удалит все товары и подборки.
+        </p>
+      </div>
+      <footer class="modal__footer">
+        <button type="button" id="btn-storage-reset" class="btn btn--danger">Сбросить данные</button>
+      </footer>
+    </div>
+  </div>
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>
