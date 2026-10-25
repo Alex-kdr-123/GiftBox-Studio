@@ -45,6 +45,12 @@ export class Router {
   }
 
   _handle() {
+    // Проверка: если хэша нет вообще или он пустой, принудительно ставим dashboard
+    if (!window.location.hash || window.location.hash === '#' || window.location.hash === '#/') {
+      this.navigate('#/dashboard');
+      return;
+    }
+
     const parts = this._parse();
     const [root, param] = parts;
     let route;
